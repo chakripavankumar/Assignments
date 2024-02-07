@@ -16,6 +16,36 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
+const filesDirectory=path.join( __dirname ,'files')
+
+app.get("/files", function(req,res){
+fs.readFileSync(filesDirectory,(err,data)=>{
+  if(err){
+    return res.status(500).send('internal server error')
+  }
+  res.status(200).json(data)
+})
+app.get('/file/:filename' , function(req,res){
+  const {filename}= req.params;
+  const filepath=path.join(filesDirectory,filename);
+  fs.readFile(filePath, 'utf8', (err, content) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        return res.status(404).send('File not found');
+      } else {
+        return res.status(500).send('Internal Server Error');
+      }
+    }
+    res.status(200).send(content);
+  });
+});
+// Handle undefined routes with a 404 response
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
+
+})
+
 
 
 module.exports = app;
